@@ -1,11 +1,12 @@
 package internal
 
-import "strconv"
+import (
+	"fmt"
+)
 
-func ToInt(s string) int {
-	i, err := strconv.Atoi(s)
+func EvaluateErr(err error, panicMsg string) {
 	if err != nil {
-		return 0
+		fmt.Printf("%+v\n", err)
+		panic(panicMsg)
 	}
-	return i
 }

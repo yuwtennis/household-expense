@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import "github.com/yuwtennis/household-expense/internal"
+
+const (
+	PaymentRecordPreix      = "MonthlyBillSummary-FullTime"
+	IncomeStatementFolderId = "1nWiE2r6IUZwZSvOW8pCoyUwjVJQEJoUh"
+)
 
 func main() {
-	// Call the function from the package
-	// "github.com/username/golang-package-example"
-	fmt.Println("Hello, World!")
+	internal.Run(IncomeStatementFolderId, PaymentRecordPreix)
 }
