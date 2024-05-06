@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"github.com/yuwtennis/household-expense/internal/bop"
+	"github.com/yuwtennis/household-expense/internal/payments"
 	"github.com/yuwtennis/household-expense/internal/services"
 	"golang.org/x/exp/slices"
 	"strconv"
@@ -14,8 +14,8 @@ func Run(folderId string, prefix string) {
 	// Call the function from the package
 	// "github.com/username/golang-package-example"
 	var spreadSheetId string
-	var incomes []bop.Income
-	var expenses []*bop.Expense
+	var incomes []payments.Income
+	var expenses []*payments.Expense
 
 	driveSrv := services.NewDrive()
 	files := services.ListFilesBy(driveSrv, folderId)
@@ -38,8 +38,8 @@ func Run(folderId string, prefix string) {
 		fmt.Printf("%s , %d\n", sheet.Properties.Title, sheet.Properties.SheetId)
 
 		if isValidCalMonth(sheet.Properties.Title) {
-			expenses = append(expenses, bop.NewExpense(sheet.Data))
-			incomes = append(incomes, bop.NewMonthlySalary(sheet.Data))
+			expenses = append(expenses, payments.NewExpense(sheet.Data))
+			incomes = append(incomes, payments.NewMonthlySalary(sheet.Data))
 		}
 	}
 

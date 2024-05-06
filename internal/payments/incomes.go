@@ -1,4 +1,4 @@
-package bop
+package payments
 
 import "google.golang.org/api/sheets/v4"
 
