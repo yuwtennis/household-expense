@@ -15,8 +15,7 @@ func NewBigQuery(projectID string) *bigquery.Client {
 	return c
 }
 
-func Write(
-	client *bigquery.Client) string {
+func Write(client *bigquery.Client, book interface{}) string {
 	// TODO MERGE https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#merge_statement
-	return "Read"
+	return "Wrote"
 }

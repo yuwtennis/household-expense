@@ -2,20 +2,22 @@ package internal
 
 import (
 	"fmt"
-	"github.com/yuwtennis/household-expense/internal/payments"
 	"github.com/yuwtennis/household-expense/internal/services"
-	"golang.org/x/exp/slices"
+	"google.golang.org/genproto/googleapis/type/month"
 	"strconv"
+	"strings"
 	"time"
+)
+
+const (
+	PaymentBookSheetRange = "B1:F57"
 )
 
 // Run orchestrates the business logic
 func Run(folderId string, prefix string) {
-	// Call the function from the package
-	// "github.com/username/golang-package-example"
 	var spreadSheetId string
-	var incomes []payments.Income
-	var expenses []*payments.Expense
+	var m int32
+	var book *MonthlyPayment
 
 	driveSrv := services.NewDrive()
 	files := services.ListFilesBy(driveSrv, folderId)
@@ -32,34 +34,18 @@ func Run(folderId string, prefix string) {
 	}
 
 	spreadSheetSrv := services.NewSpreadSheet()
-	spreadSheet, _ := spreadSheetSrv.Spreadsheets.Get(spreadSheetId).Do()
 
-	for _, sheet := range spreadSheet.Sheets {
-		fmt.Printf("%s , %d\n", sheet.Properties.Title, sheet.Properties.SheetId)
-
-		if isValidCalMonth(sheet.Properties.Title) {
-			expenses = append(expenses, payments.NewExpense(sheet.Data))
-			incomes = append(incomes, payments.NewMonthlySalary(sheet.Data))
-		}
+	for m = 1; m <= 12; m++ {
+		sheetName := (month.Month_name[m])[:1] + strings.ToLower(month.Month_name[m])[1:]
+		data, err := spreadSheetSrv.Spreadsheets.Values.Get(
+			spreadSheetId,
+			fmt.Sprintf("%s!%s", sheetName, PaymentBookSheetRange),
+		).Do()
+		EvaluateErr(err, "Error while getting data from Sheet.")
+		book = NewMP(data.Values)
 	}
 
 	// TODO Merge to bigquery
-}
-
-func isValidCalMonth(monthName string) bool {
-	calMonths := []string{
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	}
-	return slices.Contains(calMonths, monthName)
+	bqClient := services.NewBigQuery("MyProjectId")
+	services.Write(bqClient, book)
 }
