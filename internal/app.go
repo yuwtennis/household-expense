@@ -36,16 +36,18 @@ func Run(folderId string, prefix string) {
 	spreadSheetSrv := services.NewSpreadSheet()
 
 	for m = 1; m <= 12; m++ {
-		sheetName := (month.Month_name[m])[:1] + strings.ToLower(month.Month_name[m])[1:]
+		sheetName := (month.Month_name[m])[:1] + strings.ToLower(month.Month_name[m])[1:3]
 		data, err := spreadSheetSrv.Spreadsheets.Values.Get(
 			spreadSheetId,
 			fmt.Sprintf("%s!%s", sheetName, PaymentBookSheetRange),
 		).Do()
 		EvaluateErr(err, "Error while getting data from Sheet.")
 		book = NewMP(data.Values)
+
+		fmt.Printf("%+v\n", book)
 	}
 
 	// TODO Merge to bigquery
-	bqClient := services.NewBigQuery("MyProjectId")
-	services.Write(bqClient, book)
+	//bqClient := services.NewBigQuery("MyProjectId")
+	//services.Write(bqClient, book)
 }

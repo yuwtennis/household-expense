@@ -1,8 +1,15 @@
 package internal
 
+import (
+	"strconv"
+	"strings"
+)
+
 type Book struct{}
 
+// MonthlyPayment is a value object representing record of single month from Balance of Payment
 type MonthlyPayment struct {
+	Date                  string
 	Salary                int
 	IncomeTax             int
 	ResidentTax           int
@@ -35,83 +42,103 @@ type MonthlyPayment struct {
 	CreditCardView        int
 	CreditCardMC          int
 	BasicLife             int
+	AmountLeft            int
 }
 
 // NewMP is a factory function returns a instance of MonthlyPayment
-func NewMP(data [][]interface{}) *MonthlyPayment {
+func NewMP(ud [][]interface{}) *MonthlyPayment {
 	mp := new(MonthlyPayment)
 
 	// Populate the object
-	for _, row := range data {
-		if row[1].(string) == "" {
+	for _, row := range ud {
+		if len(row) <= 3 {
 			continue
 		}
+
+		switch category := row[0]; category {
+		case "給料月":
+			mp.Date = row[1].(string) + "-01"
+		case "剰余金":
+			mp.AmountLeft = ParseJpy(row[4].(string))
+		}
+
 		switch item := row[1]; item {
 		case "月収":
-			mp.Salary = row[3].(int)
+			mp.Salary = ParseJpy(row[4].(string))
 		case "所得税":
-			mp.IncomeTax = row[3].(int)
+			mp.IncomeTax = ParseJpy(row[3].(string))
 		case "住民税":
-			mp.ResidentTax = row[3].(int)
+			mp.ResidentTax = ParseJpy(row[3].(string))
 		case "生命保険":
-			mp.LifeInsurance = row[3].(int)
+			mp.LifeInsurance = ParseJpy(row[3].(string))
 		case "介護保険":
-			mp.NursingInsurance = row[3].(int)
+			mp.NursingInsurance = ParseJpy(row[3].(string))
 		case "雇用保険":
-			mp.EmploymentInsurance = row[3].(int)
+			mp.EmploymentInsurance = ParseJpy(row[3].(string))
 		case "健康保険":
-			mp.HealthInsurance = row[3].(int)
+			mp.HealthInsurance = ParseJpy(row[3].(string))
 		case "厚生年金":
-			mp.WelfarePension = row[3].(int)
+			mp.WelfarePension = ParseJpy(row[3].(string))
 		case "貯金":
-			mp.Savings = row[3].(int)
+			mp.Savings = ParseJpy(row[3].(string))
 		case "証券":
-			mp.Securities = row[3].(int)
+			mp.Securities = ParseJpy(row[3].(string))
 		case "確定拠出年金":
-			mp.Ideco = row[3].(int)
+			mp.Ideco = ParseJpy(row[3].(string))
 		case "住宅ローン":
-			mp.Mortgage = row[3].(int)
+			mp.Mortgage = ParseJpy(row[3].(string))
 		case "管理費用":
-			mp.AdministrativeFee = row[3].(int)
+			mp.AdministrativeFee = ParseJpy(row[3].(string))
 		case "積立修繕金":
-			mp.RepairFee = row[3].(int)
+			mp.RepairFee = ParseJpy(row[3].(string))
 		case "電気":
-			mp.Electricity = row[3].(int)
+			mp.Electricity = ParseJpy(row[3].(string))
 		case "ガス":
-			mp.Gas = row[3].(int)
+			mp.Gas = ParseJpy(row[3].(string))
 		case "水道":
-			mp.Water = row[3].(int)
+			mp.Water = ParseJpy(row[3].(string))
 		case "電気使用量":
-			mp.ElectricityUsageInKwh = row[3].(int)
+			mp.ElectricityUsageInKwh = ParseJpy(row[3].(string))
 		case "ガス使用量":
-			mp.GasUsageInM3 = row[3].(int)
+			mp.GasUsageInM3 = ParseJpy(row[3].(string))
 		case "水道使用量":
-			mp.WaterUsageInM3 = row[3].(int)
+			mp.WaterUsageInM3 = ParseJpy(row[3].(string))
 		case "インターネット":
-			mp.Internet = row[3].(int)
+			mp.Internet = ParseJpy(row[3].(string))
 		case "CATV":
-			mp.CableTv = row[3].(int)
+			mp.CableTv = ParseJpy(row[3].(string))
 		case "テニススクール":
-			mp.CableTv = row[3].(int)
+			mp.CableTv = ParseJpy(row[3].(string))
 		case "ピラティス":
-			mp.Pilates = row[3].(int)
+			mp.Pilates = ParseJpy(row[3].(string))
 		case "NHK":
-			mp.Nhk = row[3].(int)
+			mp.Nhk = ParseJpy(row[3].(string))
 		case "駐車場":
-			mp.CarParkingLot = row[3].(int)
+			mp.CarParkingLot = ParseJpy(row[3].(string))
 		case "駐輪場":
-			mp.BicycleParkingLot = row[3].(int)
+			mp.BicycleParkingLot = ParseJpy(row[3].(string))
 		case "自動車維持費":
-			mp.CarManagement = row[3].(int)
+			mp.CarManagement = ParseJpy(row[3].(string))
 		case "CREDITCARD_VISA":
-			mp.CreditCardVisa = row[3].(int)
+			mp.CreditCardVisa = ParseJpy(row[3].(string))
 		case "CREDITCARD_VIEW":
-			mp.CreditCardView = row[3].(int)
+			mp.CreditCardView = ParseJpy(row[3].(string))
 		case "CREDITCARD_MC":
-			mp.CreditCardMC = row[3].(int)
+			mp.CreditCardMC = ParseJpy(row[3].(string))
 		case "基本生活費":
-			mp.BasicLife = row[3].(int)
+			mp.BasicLife = ParseJpy(row[3].(string))
+		case "剰余金":
+			mp.AmountLeft = ParseJpy(row[3].(string))
 		}
 	}
 	return mp
+}
+
+// ParseJpy takes string including jpy currency mark at beginning and return as int
+func ParseJpy(s string) int {
+	res, _ := strconv.Atoi(
+		strings.ReplaceAll(
+			strings.Replace(s, "¥", "", 1),
+			",", ""))
+	return res
 }
