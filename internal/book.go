@@ -46,6 +46,7 @@ type MonthlyPayment struct {
 }
 
 // NewMP is a factory function returns a instance of MonthlyPayment
+// from unstructured data read from Google Sheet
 func NewMP(ud [][]interface{}) *MonthlyPayment {
 	mp := new(MonthlyPayment)
 
