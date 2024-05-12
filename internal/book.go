@@ -1,14 +1,25 @@
 package internal
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 )
 
-type Book struct{}
+const (
+	CategoryIncome = "income"
+)
 
-// MonthlyPayment is a value object representing record of single month from Balance of Payment
-type MonthlyPayment struct {
+type AccountRecord struct {
+	Category string `json:"category"`
+	Key      string `json:"key"`
+	Value    int    `json:"value"`
+}
+
+type Book interface{}
+
+// MonthlyAccount is a value object representing record of single month from Balance of Payment
+type MonthlyAccount struct {
 	Date                  string
 	Salary                int
 	IncomeTax             int
@@ -45,10 +56,24 @@ type MonthlyPayment struct {
 	AmountLeft            int
 }
 
-// NewMP is a factory function returns a instance of MonthlyPayment
+func (mp *MonthlyAccount) AsAccountRecords() []byte {
+	records := make([]AccountRecord, 0)
+
+	records = append(
+		records, AccountRecord{Category: CategoryIncome, Key: "Salary", Value: mp.Salary})
+
+	// TODO Rest of them
+
+	bytes, err := json.Marshal(records)
+	EvaluateErr(err, "Marshaling account records failed.")
+
+	return bytes
+}
+
+// NewMP is a factory function returns a instance of MonthlyAccount
 // from unstructured data read from Google Sheet
-func NewMP(ud [][]interface{}) *MonthlyPayment {
-	mp := new(MonthlyPayment)
+func NewMP(ud [][]interface{}) *MonthlyAccount {
+	mp := new(MonthlyAccount)
 
 	// Populate the object
 	for _, row := range ud {

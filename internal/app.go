@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"github.com/yuwtennis/household-expense/internal/services"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/genproto/googleapis/type/month"
 	"strconv"
 	"strings"
@@ -14,18 +16,23 @@ const (
 )
 
 // Run orchestrates the business logic
-func Run(folderId string, prefix string) {
+func Run(
+	gDriveFolderId string,
+	accountBookPrefix string) {
 	var spreadSheetId string
-	var m int32
-	var book *MonthlyPayment
+	var mon int32
+	var book *MonthlyAccount
+	ctx := context.Background()
 
+	// Read household account book from Google Spread Sheet
 	driveSrv := services.NewDrive()
-	files := services.ListFilesBy(driveSrv, folderId)
+	files := services.ListFilesBy(driveSrv, gDriveFolderId)
 
 	time.Local, _ = time.LoadLocation("Asia/Tokyo")
+	now := time.Now()
 
-	thisYear := strconv.Itoa(time.Now().Year())
-	isName := prefix + "-" + thisYear
+	thisYear := strconv.Itoa(now.Year())
+	isName := accountBookPrefix + "-" + thisYear
 
 	for _, file := range files {
 		if file.Name == isName {
@@ -35,19 +42,31 @@ func Run(folderId string, prefix string) {
 
 	spreadSheetSrv := services.NewSpreadSheet()
 
-	for m = 1; m <= 12; m++ {
-		sheetName := (month.Month_name[m])[:1] + strings.ToLower(month.Month_name[m])[1:3]
+	// Deserialize and write to Google Storage
+	for mon = 1; mon <= 12; mon++ {
+		sheetName := (month.Month_name[mon])[:1] + strings.ToLower(month.Month_name[mon])[1:3]
 		data, err := spreadSheetSrv.Spreadsheets.Values.Get(
 			spreadSheetId,
 			fmt.Sprintf("%s!%s", sheetName, PaymentBookSheetRange),
 		).Do()
-		EvaluateErr(err, "Error while getting data from Sheet.")
+		EvaluateErr(err, "Error while getting data from Google Sheet.")
 		book = NewMP(data.Values)
 
-		fmt.Printf("%+v\n", book)
-	}
+		storageSrv := services.NewGoogleStorage()
+		_, err = storageSrv.
+			Bucket(getCurrProjectId(ctx)).
+			Object(
+				"household-expense/date=" + now.Format("YYYY-MM-DD") + "book.json").
+			NewWriter(ctx).
+			Write(book.AsAccountRecords())
 
-	// TODO Merge to bigquery
-	//bqClient := services.NewBigQuery("MyProjectId")
-	//services.Write(bqClient, book)
+		EvaluateErr(err, "Something wrong when writing to Google Storage.")
+	}
+}
+
+func getCurrProjectId(ctx context.Context) string {
+	cred, err := google.FindDefaultCredentials(ctx)
+	EvaluateErr(err, "")
+
+	return cred.ProjectID
 }

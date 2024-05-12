@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"github.com/yuwtennis/household-expense/internal"
 	"google.golang.org/api/drive/v3"
 )
 
@@ -10,9 +11,7 @@ func NewDrive() *drive.Service {
 	ctx := context.Background()
 	driveServe, err := drive.NewService(ctx)
 
-	if err != nil {
-		panic(err)
-	}
+	internal.EvaluateErr(err, "")
 	return driveServe
 }
 

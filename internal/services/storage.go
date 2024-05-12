@@ -1,15 +1,15 @@
 package services
 
 import (
+	"cloud.google.com/go/storage"
 	"context"
 	"github.com/yuwtennis/household-expense/internal"
-	"google.golang.org/api/sheets/v4"
 )
 
-func NewSpreadSheet() *sheets.Service {
+func NewGoogleStorage() *storage.Client {
 	ctx := context.Background()
-	sheetService, err := sheets.NewService(ctx)
-
+	c, err := storage.NewClient(ctx)
 	internal.EvaluateErr(err, "")
-	return sheetService
+
+	return c
 }
