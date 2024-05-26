@@ -2,12 +2,13 @@ package internal
 
 import (
 	"encoding/json"
+	"github.com/yuwtennis/household-expense/internal/helpers"
 	"strconv"
 	"strings"
 )
 
 const (
-	CategoryIncome = "income"
+	PaymentBookSheetRange = "B1:F57"
 )
 
 type AccountRecord struct {
@@ -56,16 +57,9 @@ type MonthlyAccount struct {
 	AmountLeft            int
 }
 
-func (mp *MonthlyAccount) AsAccountRecords() []byte {
-	records := make([]AccountRecord, 0)
-
-	records = append(
-		records, AccountRecord{Category: CategoryIncome, Key: "Salary", Value: mp.Salary})
-
-	// TODO Rest of them
-
-	bytes, err := json.Marshal(records)
-	EvaluateErr(err, "Marshaling account records failed.")
+func (mp *MonthlyAccount) Serialize() []byte {
+	bytes, err := json.Marshal(mp)
+	helpers.EvaluateErr(err, "Marshaling account records failed.")
 
 	return bytes
 }
@@ -77,7 +71,7 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 
 	// Populate the object
 	for _, row := range ud {
-		if len(row) <= 3 {
+		if len(row) < 1 {
 			continue
 		}
 

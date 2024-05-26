@@ -3,10 +3,14 @@ package main
 import "github.com/yuwtennis/household-expense/internal"
 
 const (
-	PaymentRecordPreix      = "MonthlyBillSummary-FullTime"
+	PaymentRecordBookName   = "MonthlyBillSummary-FullTime-2024"
 	IncomeStatementFolderId = "1nWiE2r6IUZwZSvOW8pCoyUwjVJQEJoUh"
+	BucketName              = "elite-caster-125113"
 )
 
 func main() {
-	internal.Run(IncomeStatementFolderId, PaymentRecordPreix)
+	internal.Run(
+		IncomeStatementFolderId,
+		PaymentRecordBookName,
+		BucketName)
 }

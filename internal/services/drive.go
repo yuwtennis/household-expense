@@ -3,27 +3,30 @@ package services
 import (
 	"context"
 	"fmt"
-	"github.com/yuwtennis/household-expense/internal"
+	"github.com/yuwtennis/household-expense/internal/helpers"
 	"google.golang.org/api/drive/v3"
 )
 
-func NewDrive() *drive.Service {
-	ctx := context.Background()
-	driveServe, err := drive.NewService(ctx)
-
-	internal.EvaluateErr(err, "")
-	return driveServe
+type GDrive struct {
+	client *drive.Service
 }
 
-func ListFilesBy(
-	srv *drive.Service,
+func NewDrive() *GDrive {
+	ctx := context.Background()
+	srv, err := drive.NewService(ctx)
+
+	helpers.EvaluateErr(err, "")
+	return &GDrive{client: srv}
+}
+
+func (g *GDrive) ListFilesBy(
 	folderId string) []*drive.File {
 	// TODO Error handling
 	var files []*drive.File
 	var nextPageToken string
 	qString := fmt.Sprintf("'%s' in parents", folderId)
 
-	driveListCall := srv.Files.
+	driveListCall := g.client.Files.
 		List().
 		PageSize(1).
 		Fields("nextPageToken, files(id, name)").
