@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	BqExpensesDsName  = "expenses"
 	BqExpensesTblName = "household"
 )
 
@@ -38,15 +37,11 @@ func Run(folderId string, bookName string, bucketName string) {
 	gcsSrv := services.NewGoogleStorage()
 
 	for v := range ch {
-		date := strings.Split(v.Date, "-")
-
 		gcsSrv.Write(
 			bucketName,
-			fmt.Sprintf("%s/%s/%s/%s.json",
-				BqExpensesDsName,
+			fmt.Sprintf("%s/%s",
 				BqExpensesTblName,
-				date[0],
-				date[1],
+				v.AsHivePartitionLayout(),
 			),
 			v.Serialize(),
 			ctx)

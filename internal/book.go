@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/yuwtennis/household-expense/internal/helpers"
 	"strconv"
 	"strings"
@@ -55,13 +56,6 @@ type MonthlyAccount struct {
 	CreditCardMC          int
 	BasicLife             int
 	AmountLeft            int
-}
-
-func (mp *MonthlyAccount) Serialize() []byte {
-	bytes, err := json.Marshal(mp)
-	helpers.EvaluateErr(err, "Marshaling account records failed.")
-
-	return bytes
 }
 
 // NewMP is a factory function returns a instance of MonthlyAccount
@@ -152,6 +146,22 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 		}
 	}
 	return mp
+}
+
+func (mp *MonthlyAccount) Serialize() []byte {
+	bytes, err := json.Marshal(mp)
+	helpers.EvaluateErr(err, "Marshaling account records failed.")
+
+	return bytes
+}
+
+func (mp *MonthlyAccount) AsHivePartitionLayout() string {
+	date := strings.Split(mp.Date, "-")
+
+	return fmt.Sprintf("year=%s/%s.json",
+		date[0],
+		date[1],
+	)
 }
 
 // ParseJpy takes string including jpy currency mark at beginning and return as int

@@ -1,16 +1,22 @@
 package main
 
-import "github.com/yuwtennis/household-expense/internal"
-
-const (
-	PaymentRecordBookName   = "MonthlyBillSummary-FullTime-2024"
-	IncomeStatementFolderId = "1nWiE2r6IUZwZSvOW8pCoyUwjVJQEJoUh"
-	BucketName              = "elite-caster-125113"
+import (
+	"fmt"
+	"github.com/yuwtennis/household-expense/internal"
+	"os"
+	"time"
 )
 
 func main() {
+	driveId := os.Getenv("GDRIVE_FOLDER_ID")
+	bucketName := os.Getenv("BUCKET_NAME")
+
+	// FIXME Too stateful
+	time.Local, _ = time.LoadLocation("Asia/Tokyo")
+	bookName := fmt.Sprintf("MonthlyBillSummary-FullTime-%d", time.Now().Year())
+
 	internal.Run(
-		IncomeStatementFolderId,
-		PaymentRecordBookName,
-		BucketName)
+		driveId,
+		bookName,
+		bucketName)
 }
