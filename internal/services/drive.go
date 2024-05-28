@@ -32,7 +32,9 @@ func (g *GDrive) ListFilesBy(
 		Fields("nextPageToken, files(id, name)").
 		Q(qString)
 
-	fileList, _ := driveListCall.Do()
+	fileList, err := driveListCall.Do()
+
+	helpers.EvaluateErr(err, "Something went wrong while accessing google drive.")
 
 	if len(fileList.Files) > 0 {
 		files = append(files, fileList.Files...)
@@ -41,10 +43,10 @@ func (g *GDrive) ListFilesBy(
 	nextPageToken = fileList.NextPageToken
 
 	for len(nextPageToken) > 0 {
-		fileList, _ = driveListCall.
+		fileList, err = driveListCall.
 			PageToken(nextPageToken).
 			Do()
-
+		helpers.EvaluateErr(err, "Something went wrong while accessing google drive.")
 		nextPageToken = fileList.NextPageToken
 		files = append(files, fileList.Files...)
 	}
