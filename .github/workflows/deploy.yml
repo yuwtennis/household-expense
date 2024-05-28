@@ -7,9 +7,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    strategy:
-      matrix:
-        go-version: [ '1.22' ]
+    env:
+      GO_VERSION: 1.22
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -20,13 +19,13 @@ jobs:
           service_account: "github-actions@elite-caster-125113.iam.gserviceaccount.com"
       - name: Login to GAR
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-      - name: Setup Go ${{ matrix.go-version }}
+      - name: Setup Go $GO_VERSION
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: $GO_VERSION
       - name: Build image
         run: go mod tidy && make build push
-      - id: "deploy"
+      - id: deploy
         uses: "google-github-actions/deploy-cloudrun@v2"
         with:
           service: "household-expense"
