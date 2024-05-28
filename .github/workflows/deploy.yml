@@ -1,7 +1,7 @@
 on: workflow_call
 
 jobs:
-  build:
+  deploy:
     name: Continuous deployment
     runs-on: ubuntu-latest
     permissions:
