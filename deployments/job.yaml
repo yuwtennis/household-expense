@@ -1,0 +1,29 @@
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: household-expense
+spec:
+  template:
+    spec:
+      template:
+        spec:
+          serviceAccountName: "household-exp-job"
+          containers:
+            - image: asia-northeast1-docker.pkg.dev/elite-caster-125113/household-expense/dev:TAG
+              args:
+                - app
+              env:
+                - name: "GDRIVE_FOLDER_ID"
+                  valueFrom:
+                    secretKeyRef:
+                      key: "1"
+                      name: "gdrive_folder_id"
+                - name: "BUCKET_NAME"
+                  valueFrom:
+                    secretKeyRef:
+                      key: "1"
+                      name: "bucket_name"
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: "512Mi"

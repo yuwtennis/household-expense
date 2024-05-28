@@ -1,0 +1,15 @@
+name: Main
+
+on: [push]
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+  lint:
+    uses: ./.github/workflows/lint.yml
+  deploy:
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    uses: ./.github/workflows/deploy.yml
+    needs:
+      - lint
+      - test

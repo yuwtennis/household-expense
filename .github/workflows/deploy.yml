@@ -1,0 +1,29 @@
+on: workflow_call
+
+jobs:
+  deploy:
+    name: Continuous deployment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GO_VERSION: 1.22
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/462754264937/locations/global/workloadIdentityPools/github-actions/providers/oidc"
+          service_account: "github-actions@elite-caster-125113.iam.gserviceaccount.com"
+      - name: Login to GAR
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+      - name: Setup Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Build image
+        run: go mod tidy && make build push
+      - name: Deploy
+        run: make deploy
