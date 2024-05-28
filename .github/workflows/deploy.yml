@@ -30,7 +30,9 @@ jobs:
         uses: "google-github-actions/deploy-cloudrun@v2"
         with:
           service: "household-expense"
+          region: "asia-northeast1"
           image: "asia-northeast1-docker.pkg.dev/elite-caster-125113/household-expense/dev:${{ github.sha }}"
           secrets: |
             GDRIVE_FOLDER_ID=gdrive_folder_id:latest
             BUCKET_NAME=bucket_name:latest
+          flags: '--service-account=household-exp-job --args=app'
