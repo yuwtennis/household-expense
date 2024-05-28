@@ -1,0 +1,29 @@
+on: workflow_call
+
+jobs:
+  build:
+    name: Continuous deployment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/462754264937/locations/global/workloadIdentityPools/github-actions/providers/oidc"
+          service_account: "github-actions@elite-caster-125113.iam.gserviceaccount.com"
+      - name: Login to GAR
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+      - name: Build image
+        run: make build push
+      - id: "deploy"
+        uses: "google-github-actions/deploy-cloudrun@v2"
+        with:
+          service: "household-expense"
+          image: "asia-northeast1-docker.pkg.dev/elite-caster-125113/household-expense/dev:${{ github.sha }}"
+          secrets: |
+            GDRIVE_FOLDER_ID=gdrive_folder_id:latest
+            BUCKET_NAME=bucket_name:latest
