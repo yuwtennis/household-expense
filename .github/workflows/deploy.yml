@@ -18,7 +18,7 @@ jobs:
       - name: Login to GAR
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
       - name: Build image
-        run: make build push
+        run: go mod tidy && make build push
       - id: "deploy"
         uses: "google-github-actions/deploy-cloudrun@v2"
         with:
