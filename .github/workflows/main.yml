@@ -10,6 +10,9 @@ jobs:
   deploy:
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     uses: ./.github/workflows/deploy.yml
+    secrets:
+      GOOGLE_WORKLOAD_IDENTITY_PATH: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PATH }}
+      GOOGLE_CD_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_CD_SERVICE_ACCOUNT }}
     needs:
       - lint
       - test

@@ -1,4 +1,10 @@
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      GOOGLE_WORKLOAD_IDENTITY_PATH:
+        required: true
+      GOOGLE_CD_SERVICE_ACCOUNT:
+        required: true
 
 jobs:
   deploy:
@@ -15,8 +21,8 @@ jobs:
       - id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/462754264937/locations/global/workloadIdentityPools/github-actions/providers/oidc"
-          service_account: "github-actions@elite-caster-125113.iam.gserviceaccount.com"
+          workload_identity_provider: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PATH }}
+          service_account: ${{ secrets.GOOGLE_CD_SERVICE_ACCOUNT }}
       - name: Login to GAR
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
       - name: Setup Go ${{ env.GO_VERSION }}
