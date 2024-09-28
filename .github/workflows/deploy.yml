@@ -23,6 +23,10 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PATH }}
           service_account: ${{ secrets.GOOGLE_CD_SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
       - name: Login to GAR
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
       - name: Setup Go ${{ env.GO_VERSION }}
