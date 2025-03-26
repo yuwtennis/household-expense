@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	cloud.google.com/go/storage v1.51.0
-	google.golang.org/api v0.227.0
+	google.golang.org/api v0.228.0
 	google.golang.org/genproto v0.0.0-20250324211829-b45e905df463
 )
 
