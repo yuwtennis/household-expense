@@ -19,7 +19,6 @@ var (
 		"IncomeTax":             "所得税",
 		"ResidentTax":           "住民税",
 		"LifeInsurance":         "生命保険",
-		"NursingInsurance":      "介護保険",
 		"LongTermCareInsurance": "介護保険",
 		"EmploymentInsurance":   "雇用保険",
 		"HealthInsurance":       "健康保険",
@@ -68,10 +67,11 @@ type MonthlyAccount struct {
 	IncomeTax             int
 	ResidentTax           int
 	LifeInsurance         int
-	NursingInsurance      int
+	LongTermCareInsurance int
 	EmploymentInsurance   int
 	HealthInsurance       int
 	WelfarePension        int
+	PensionInsurance      int
 	Savings               int
 	Securities            int
 	Ideco                 int
@@ -126,14 +126,16 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 			mp.ResidentTax = ParseJpy(row[3].(string))
 		case PaymentItemMap["LifeInsurance"]:
 			mp.LifeInsurance = ParseJpy(row[3].(string))
-		case PaymentItemMap["NursingInsurance"]:
-			mp.NursingInsurance = ParseJpy(row[3].(string))
+		case PaymentItemMap["LongTermCareInsurance"]:
+			mp.LongTermCareInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["EmploymentInsurance"]:
 			mp.EmploymentInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["HealthInsurance"]:
 			mp.HealthInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["WelfarePension"]:
 			mp.WelfarePension = ParseJpy(row[3].(string))
+		case PaymentItemMap["PensionInsurance"]:
+			mp.PensionInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["Savings"]:
 			mp.Savings = ParseJpy(row[3].(string))
 		case PaymentItemMap["Securities"]:
