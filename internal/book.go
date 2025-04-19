@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// TODO This will be set to B1:B56 in 2026.
 	PaymentBookSheetRange = "B1:F57"
 )
 
@@ -70,7 +71,7 @@ type MonthlyAccount struct {
 	LongTermCareInsurance int
 	EmploymentInsurance   int
 	HealthInsurance       int
-	WelfarePension        int
+	WelfarePension        int // TODO Deprecate in 2026
 	PensionInsurance      int
 	Savings               int
 	Securities            int
