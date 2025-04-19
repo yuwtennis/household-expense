@@ -12,6 +12,47 @@ const (
 	PaymentBookSheetRange = "B1:F57"
 )
 
+var (
+	PaymentItemMap = map[string]string{
+		"Date":                  "給料月",
+		"Salary":                "月収",
+		"IncomeTax":             "所得税",
+		"ResidentTax":           "住民税",
+		"LifeInsurance":         "生命保険",
+		"NursingInsurance":      "介護保険",
+		"LongTermCareInsurance": "介護保険",
+		"EmploymentInsurance":   "雇用保険",
+		"HealthInsurance":       "健康保険",
+		"WelfarePension":        "厚生年金",
+		"PensionInsurance":      "年金保険",
+		"Savings":               "貯金",
+		"Securities":            "証券",
+		"Ideco":                 "確定拠出年金",
+		"Mortgage":              "住宅ローン",
+		"AdministrativeFee":     "管理費用",
+		"RepairFee":             "積立修繕金",
+		"Electricity":           "電気",
+		"Gas":                   "ガス",
+		"Water":                 "水道",
+		"ElectricityUsageInKwh": "電気使用量",
+		"GasUsageInM3":          "ガス使用量",
+		"WaterUsageInM3":        "水道使用量",
+		"Internet":              "インターネット",
+		"CableTv":               "CATV",
+		"TennisClub":            "テニススクール",
+		"Pilates":               "ピラティス",
+		"Nhk":                   "NHK",
+		"CarParkingLot":         "駐車場",
+		"BicycleParkingLot":     "駐輪場",
+		"CarManagement":         "自動車維持費",
+		"CreditCardVisa":        "CREDITCARD_VISA",
+		"CreditCardView":        "CREDITCARD_VIEW",
+		"CreditCardMC":          "CREDITCARD_MC",
+		"BasicLife":             "基本生活費",
+		"Amountleft":            "剰余金",
+	}
+)
+
 type AccountRecord struct {
 	Category string `json:"category"`
 	Key      string `json:"key"`
@@ -70,79 +111,75 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 		}
 
 		switch category := row[0]; category {
-		case "給料月":
+		case PaymentItemMap["Date"]:
 			mp.Date = row[1].(string) + "-01"
-		case "剰余金":
+		case PaymentItemMap["Amountleft"]:
 			mp.AmountLeft = ParseJpy(row[4].(string))
 		}
 
 		switch item := row[1]; item {
-		case "月収":
+		case PaymentItemMap["Salary"]:
 			mp.Salary = ParseJpy(row[4].(string))
-		case "所得税":
+		case PaymentItemMap["IncomeTax"]:
 			mp.IncomeTax = ParseJpy(row[3].(string))
-		case "住民税":
+		case PaymentItemMap["ResidentTax"]:
 			mp.ResidentTax = ParseJpy(row[3].(string))
-		case "生命保険":
+		case PaymentItemMap["LifeInsurance"]:
 			mp.LifeInsurance = ParseJpy(row[3].(string))
-		case "介護保険":
+		case PaymentItemMap["NursingInsurance"]:
 			mp.NursingInsurance = ParseJpy(row[3].(string))
-		case "雇用保険":
+		case PaymentItemMap["EmploymentInsurance"]:
 			mp.EmploymentInsurance = ParseJpy(row[3].(string))
-		case "健康保険":
+		case PaymentItemMap["HealthInsurance"]:
 			mp.HealthInsurance = ParseJpy(row[3].(string))
-		case "厚生年金":
+		case PaymentItemMap["WelfarePension"]:
 			mp.WelfarePension = ParseJpy(row[3].(string))
-		case "貯金":
+		case PaymentItemMap["Savings"]:
 			mp.Savings = ParseJpy(row[3].(string))
-		case "証券":
+		case PaymentItemMap["Securities"]:
 			mp.Securities = ParseJpy(row[3].(string))
-		case "確定拠出年金":
+		case PaymentItemMap["Ideco"]:
 			mp.Ideco = ParseJpy(row[3].(string))
-		case "住宅ローン":
+		case PaymentItemMap["Mortgage"]:
 			mp.Mortgage = ParseJpy(row[3].(string))
-		case "管理費用":
+		case PaymentItemMap["AdministrativeFee"]:
 			mp.AdministrativeFee = ParseJpy(row[3].(string))
-		case "積立修繕金":
+		case PaymentItemMap["RepairFee"]:
 			mp.RepairFee = ParseJpy(row[3].(string))
-		case "電気":
+		case PaymentItemMap["Electricity"]:
 			mp.Electricity = ParseJpy(row[3].(string))
-		case "ガス":
+		case PaymentItemMap["Gas"]:
 			mp.Gas = ParseJpy(row[3].(string))
-		case "水道":
+		case PaymentItemMap["Water"]:
 			mp.Water = ParseJpy(row[3].(string))
-		case "電気使用量":
+		case PaymentItemMap["ElectricityUsageInKwh"]:
 			mp.ElectricityUsageInKwh = ParseJpy(row[3].(string))
-		case "ガス使用量":
+		case PaymentItemMap["GasUsageInM3"]:
 			mp.GasUsageInM3 = ParseJpy(row[3].(string))
-		case "水道使用量":
+		case PaymentItemMap["WaterUsageInM3"]:
 			mp.WaterUsageInM3 = ParseJpy(row[3].(string))
-		case "インターネット":
+		case PaymentItemMap["Internet"]:
 			mp.Internet = ParseJpy(row[3].(string))
-		case "CATV":
+		case PaymentItemMap["CableTv"]:
 			mp.CableTv = ParseJpy(row[3].(string))
-		case "テニススクール":
-			mp.CableTv = ParseJpy(row[3].(string))
-		case "ピラティス":
+		case PaymentItemMap["Pilates"]:
 			mp.Pilates = ParseJpy(row[3].(string))
-		case "NHK":
+		case PaymentItemMap["Nhk"]:
 			mp.Nhk = ParseJpy(row[3].(string))
-		case "駐車場":
+		case PaymentItemMap["CarParkingLot"]:
 			mp.CarParkingLot = ParseJpy(row[3].(string))
-		case "駐輪場":
+		case PaymentItemMap["BicycleParkingLot"]:
 			mp.BicycleParkingLot = ParseJpy(row[3].(string))
-		case "自動車維持費":
+		case PaymentItemMap["CarManagement"]:
 			mp.CarManagement = ParseJpy(row[3].(string))
-		case "CREDITCARD_VISA":
+		case PaymentItemMap["CreditCardVisa"]:
 			mp.CreditCardVisa = ParseJpy(row[3].(string))
-		case "CREDITCARD_VIEW":
+		case PaymentItemMap["CreditCardView"]:
 			mp.CreditCardView = ParseJpy(row[3].(string))
-		case "CREDITCARD_MC":
+		case PaymentItemMap["CreditCardMC"]:
 			mp.CreditCardMC = ParseJpy(row[3].(string))
-		case "基本生活費":
+		case PaymentItemMap["BasicLife"]:
 			mp.BasicLife = ParseJpy(row[3].(string))
-		case "剰余金":
-			mp.AmountLeft = ParseJpy(row[3].(string))
 		}
 	}
 	return mp
