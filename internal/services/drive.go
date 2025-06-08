@@ -13,6 +13,7 @@ type GDrive struct {
 
 func NewDrive() *GDrive {
 	ctx := context.Background()
+
 	srv, err := drive.NewService(ctx)
 
 	helpers.EvaluateErr(err, "")
