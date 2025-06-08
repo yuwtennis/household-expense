@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	// TODO This will be set to B1:B56 in 2026.
-	PaymentBookSheetRange = "B1:F57"
+	PaymentBookSheetRange = "B1:F59"
 )
 
 var (
@@ -19,11 +18,12 @@ var (
 		"Salary":                "月収",
 		"IncomeTax":             "所得税",
 		"ResidentTax":           "住民税",
+		"FixedAssetTax":         "固定資産税",
+		"CityPlanningTax":       "都市計画税",
 		"LifeInsurance":         "生命保険",
 		"LongTermCareInsurance": "介護保険",
 		"EmploymentInsurance":   "雇用保険",
 		"HealthInsurance":       "健康保険",
-		"WelfarePension":        "厚生年金",
 		"PensionInsurance":      "年金保険",
 		"Savings":               "貯金",
 		"Securities":            "証券",
@@ -67,11 +67,12 @@ type MonthlyAccount struct {
 	Salary                int
 	IncomeTax             int
 	ResidentTax           int
+	FixedAssetTax         int
+	CityPlanningTax       int
 	LifeInsurance         int
 	LongTermCareInsurance int
 	EmploymentInsurance   int
 	HealthInsurance       int
-	WelfarePension        int // TODO Deprecate in 2026
 	PensionInsurance      int
 	Savings               int
 	Securities            int
@@ -125,6 +126,10 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 			mp.IncomeTax = ParseJpy(row[3].(string))
 		case PaymentItemMap["ResidentTax"]:
 			mp.ResidentTax = ParseJpy(row[3].(string))
+		case PaymentItemMap["FixedAssetTax"]:
+			mp.FixedAssetTax = ParseJpy(row[3].(string))
+		case PaymentItemMap["CityPlanningTax"]:
+			mp.CityPlanningTax = ParseJpy(row[3].(string))
 		case PaymentItemMap["LifeInsurance"]:
 			mp.LifeInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["LongTermCareInsurance"]:
@@ -133,8 +138,6 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 			mp.EmploymentInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["HealthInsurance"]:
 			mp.HealthInsurance = ParseJpy(row[3].(string))
-		case PaymentItemMap["WelfarePension"]:
-			mp.WelfarePension = ParseJpy(row[3].(string))
 		case PaymentItemMap["PensionInsurance"]:
 			mp.PensionInsurance = ParseJpy(row[3].(string))
 		case PaymentItemMap["Savings"]:
