@@ -1,5 +1,7 @@
 # household-expense
 
+## How to's
+
 ## Run
 
 ```shell
