@@ -27,19 +27,13 @@ func Run(folderId string, bookName string, bucketName string) *helpers.AppErr {
 		return driveErr
 	}
 
-	files, listErr := driveSrv.ListFilesBy(folderId)
+	spreadSheetId, listErr := driveSrv.GetFile(folderId, bookName)
 
 	if listErr != nil {
 		return listErr
 	}
 
 	time.Local, _ = time.LoadLocation("Asia/Tokyo")
-
-	for _, file := range files {
-		if file.Name == bookName {
-			spreadSheetId = file.Id
-		}
-	}
 
 	spreadSheetSrv, sheetErr := services.NewSpreadSheet()
 
