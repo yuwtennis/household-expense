@@ -11,18 +11,23 @@ type GDrive struct {
 	client *drive.Service
 }
 
-func NewDrive() *GDrive {
+func NewDrive() (*GDrive, *helpers.AppErr) {
 	ctx := context.Background()
 
 	srv, err := drive.NewService(ctx)
 
-	helpers.EvaluateErr(err, "")
-	return &GDrive{client: srv}
+	if err != nil {
+		return nil, &helpers.AppErr{
+			Error: err,
+			Msg:   "Error creating drive client",
+		}
+	}
+
+	return &GDrive{client: srv}, nil
 }
 
 func (g *GDrive) ListFilesBy(
-	folderId string) []*drive.File {
-	// TODO Error handling
+	folderId string) ([]*drive.File, *helpers.AppErr) {
 	var files []*drive.File
 	var nextPageToken string
 	qString := fmt.Sprintf("'%s' in parents", folderId)
@@ -33,9 +38,14 @@ func (g *GDrive) ListFilesBy(
 		Fields("nextPageToken, files(id, name)").
 		Q(qString)
 
-	fileList, err := driveListCall.Do()
+	fileList, dListErr := driveListCall.Do()
 
-	helpers.EvaluateErr(err, "Something went wrong while accessing google drive.")
+	if dListErr != nil {
+		return nil, &helpers.AppErr{
+			Error: dListErr,
+			Msg:   "Something went wrong while accessing google drive.",
+		}
+	}
 
 	if len(fileList.Files) > 0 {
 		files = append(files, fileList.Files...)
@@ -44,13 +54,18 @@ func (g *GDrive) ListFilesBy(
 	nextPageToken = fileList.NextPageToken
 
 	for len(nextPageToken) > 0 {
-		fileList, err = driveListCall.
+		fileList, dListErr = driveListCall.
 			PageToken(nextPageToken).
 			Do()
-		helpers.EvaluateErr(err, "Something went wrong while accessing google drive.")
+		if dListErr != nil {
+			return nil, &helpers.AppErr{
+				Error: dListErr,
+				Msg:   "Something went wrong while accessing google drive.",
+			}
+		}
 		nextPageToken = fileList.NextPageToken
 		files = append(files, fileList.Files...)
 	}
 
-	return files
+	return files, nil
 }
