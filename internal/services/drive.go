@@ -26,46 +26,32 @@ func NewDrive() (*GDrive, *helpers.AppErr) {
 	return &GDrive{client: srv}, nil
 }
 
-func (g *GDrive) ListFilesBy(
-	folderId string) ([]*drive.File, *helpers.AppErr) {
-	var files []*drive.File
-	var nextPageToken string
-	qString := fmt.Sprintf("'%s' in parents", folderId)
+func (g *GDrive) GetFile(
+	folderId string,
+	bookName string) (string, *helpers.AppErr) {
+	qString := fmt.Sprintf("'%s' in parents and name = '%s'", folderId, bookName)
 
 	driveListCall := g.client.Files.
 		List().
 		PageSize(1).
-		Fields("nextPageToken, files(id, name)").
+		Fields("files(id, name)").
 		Q(qString)
 
-	fileList, dListErr := driveListCall.Do()
+	file, dListErr := driveListCall.Do()
 
 	if dListErr != nil {
-		return nil, &helpers.AppErr{
+		return "", &helpers.AppErr{
 			Error: dListErr,
 			Msg:   "Something went wrong while accessing google drive.",
 		}
 	}
 
-	if len(fileList.Files) > 0 {
-		files = append(files, fileList.Files...)
-	}
-
-	nextPageToken = fileList.NextPageToken
-
-	for len(nextPageToken) > 0 {
-		fileList, dListErr = driveListCall.
-			PageToken(nextPageToken).
-			Do()
-		if dListErr != nil {
-			return nil, &helpers.AppErr{
-				Error: dListErr,
-				Msg:   "Something went wrong while accessing google drive.",
-			}
+	if len(file.Files) < 1 {
+		return "", &helpers.AppErr{
+			Error: nil,
+			Msg:   fmt.Sprintf("File does not exist. filename: %s", bookName),
 		}
-		nextPageToken = fileList.NextPageToken
-		files = append(files, fileList.Files...)
 	}
 
-	return files, nil
+	return file.Files[len(file.Files)-1].Id, nil
 }
