@@ -10,29 +10,44 @@ type GCS struct {
 	client *storage.Client
 }
 
-func NewGoogleStorage() *GCS {
+func NewGoogleStorage() (*GCS, *helpers.AppErr) {
 	ctx := context.Background()
 	srv, err := storage.NewClient(ctx)
-	helpers.EvaluateErr(err, "Something went wrong when creating a client.")
 
-	return &GCS{client: srv}
+	if err != nil {
+		return nil, &helpers.AppErr{
+			Error: err,
+			Msg:   "Something went wrong when creating a client.",
+		}
+	}
+
+	return &GCS{client: srv}, nil
 }
 
 func (g *GCS) Write(
 	bucketName string,
 	folderPath string,
 	b []byte,
-	ctx context.Context) {
+	ctx context.Context) *helpers.AppErr {
 
 	wc := g.client.
 		Bucket(bucketName).
 		Object(
 			folderPath).
 		NewWriter(ctx)
+
+	defer func(w *storage.Writer) {
+		_ = w.Close()
+	}(wc)
+
 	wc.ContentType = "text/plain"
 	_, errW := wc.Write(b)
-	helpers.EvaluateErr(errW, "Something wrong when writing to Google Storage.")
+	if errW != nil {
+		return &helpers.AppErr{
+			Error: errW,
+			Msg:   "Something wrong when writing to Google Storage.",
+		}
+	}
 
-	errC := wc.Close()
-	helpers.EvaluateErr(errC, "Something wrong when closing writer.")
+	return nil
 }

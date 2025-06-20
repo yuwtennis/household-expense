@@ -191,11 +191,17 @@ func NewMP(ud [][]interface{}) *MonthlyAccount {
 	return mp
 }
 
-func (mp *MonthlyAccount) Serialize() []byte {
+func (mp *MonthlyAccount) Serialize() ([]byte, *helpers.AppErr) {
 	bytes, err := json.Marshal(mp)
-	helpers.EvaluateErr(err, "Marshaling account records failed.")
 
-	return bytes
+	if err != nil {
+		return nil, &helpers.AppErr{
+			Error: err,
+			Msg:   "Marshaling account records failed.",
+		}
+	}
+
+	return bytes, nil
 }
 
 func (mp *MonthlyAccount) AsHivePartitionLayout() string {
