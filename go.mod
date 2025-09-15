@@ -3,7 +3,7 @@ module github.com/yuwtennis/household-expense
 go 1.24.0
 
 require (
-	cloud.google.com/go/storage v1.56.1
+	cloud.google.com/go/storage v1.56.2
 	google.golang.org/api v0.249.0
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822
 )
